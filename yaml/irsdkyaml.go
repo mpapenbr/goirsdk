@@ -4,7 +4,7 @@
 */
 
 //nolint:tagliatelle,lll //by design
-package irsdk
+package yaml
 
 type AeroBalanceCalc struct {
 	FrontDownforce string `yaml:"FrontDownforce" json:"FrontDownforce"`

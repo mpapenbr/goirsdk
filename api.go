@@ -16,11 +16,12 @@ import (
 	"time"
 	"unsafe"
 
+	"github.com/mpapenbr/goirsdk/yaml"
 	"golang.org/x/exp/slices"
 	"golang.org/x/sys/windows"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/transform"
-	"gopkg.in/yaml.v3"
+	goyaml "gopkg.in/yaml.v3"
 )
 
 const (
@@ -43,7 +44,7 @@ type Irsdk struct {
 	lastValidTickCount int32                  // tickCount of the latest...Buffer
 	lastValidTime      time.Time              // timestamp of the latest valid data
 	dataDict           map[string]interface{} // holds all data from API
-	irsdkYaml          IrsdkYaml              // parsed yaml data
+	irsdkYaml          yaml.IrsdkYaml         // parsed yaml data
 }
 
 type ApiConfig struct {
@@ -134,8 +135,8 @@ func (irsdk *Irsdk) GetData() bool {
 	return true
 }
 
-func (irsdk *Irsdk) GetYaml() (*IrsdkYaml, error) {
-	err := yaml.Unmarshal([]byte(irsdk.GetYamlString()), &irsdk.irsdkYaml)
+func (irsdk *Irsdk) GetYaml() (*yaml.IrsdkYaml, error) {
+	err := goyaml.Unmarshal([]byte(irsdk.GetYamlString()), &irsdk.irsdkYaml)
 	if err != nil {
 		return nil, err
 	}
@@ -263,7 +264,7 @@ func (irsdk *Irsdk) readYaml() {
 	wInUtf8.Write([]byte(extractCStringFromSlice(yamlBuf)))
 	wInUtf8.Close()
 
-	err := yaml.Unmarshal(b.Bytes(), &irsdk.dataDict)
+	err := goyaml.Unmarshal(b.Bytes(), &irsdk.dataDict)
 	if err != nil {
 		log.Printf("Error parsing yaml file: %v", err)
 		return
