@@ -105,7 +105,7 @@ type Drivers struct {
 	HelmetType              int     `yaml:"HelmetType" json:"HelmetType"`
 	IRating                 int     `yaml:"IRating" json:"IRating"`
 	IsSpectator             int     `yaml:"IsSpectator" json:"IsSpectator"`
-	LicColor                int     `yaml:"LicColor" json:"LicColor"`
+	LicColor                any     `yaml:"LicColor" json:"LicColor"`
 	LicLevel                int     `yaml:"LicLevel" json:"LicLevel"`
 	LicString               string  `yaml:"LicString" json:"LicString"`
 	LicSubLevel             int     `yaml:"LicSubLevel" json:"LicSubLevel"`
