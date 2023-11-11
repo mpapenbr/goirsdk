@@ -1,4 +1,4 @@
-package main
+package irsdk
 
 const (
 	MemMapFileSize = 1164 * 1024
