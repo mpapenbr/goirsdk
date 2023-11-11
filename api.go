@@ -1,4 +1,4 @@
-package irsdk
+package main
 
 import (
 	"bytes"
