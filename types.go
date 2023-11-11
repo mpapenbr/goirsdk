@@ -14,6 +14,8 @@ type (
 	irValue interface {
 		int32 | float32 | float64 | bool
 	}
+	SessionState int32
+	Flags        int64
 )
 
 const (
@@ -27,6 +29,48 @@ const (
 	// 8 bytes
 	irsdkDouble
 	irsdkETCount
+)
+
+const (
+	FlagCheckered Flags = 1 << iota
+	FlagWhite
+	FlagGreen
+	FlagYello
+	FlagRed
+	FlagBlue
+	FlagDebris
+	FlagCrossed
+	FlagYellowWaving
+	FlagOneLapToGreen
+	FlagGreenHeld
+	FlagTenToGo
+	FlagFiveToGo
+	FlagRandomWaving
+	FlagCaution
+	FlagCautionWaving
+
+	// driver black flacks
+	FlagBlack      Flags = 0x010000
+	FlagDisqualify Flags = 0x020000
+	FlagServicible Flags = 0x040000
+	FlagFurled     Flags = 0x080000
+	FlagRepair     Flags = 0x100000
+
+	// start lights
+	FlagStartHidden Flags = 0x10000000
+	FlagStartReady  Flags = 0x20000000
+	FlagStartSet    Flags = 0x40000000
+	FlagStartGo     Flags = 0x80000000
+)
+
+const (
+	StateInvalid SessionState = iota
+	StateGetInCar
+	StateWarmup
+	StateParadeLaps
+	StateRacing
+	StateCheckered
+	StateCoolDown
 )
 
 type (

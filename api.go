@@ -29,7 +29,10 @@ const (
 	DataValidEventName = "Local\\IRSDKDataValidEvent"
 )
 
-var ErrInvalidDataRequest = errors.New("Invalid data request")
+var (
+	ErrInvalidDataRequest = errors.New("Invalid data request")
+	ErrNoMatchingDataType = errors.New("requested data type does not match iRacing data type")
+)
 
 type Irsdk struct {
 	SimIsRunning       bool
@@ -132,6 +135,7 @@ func (irsdk *Irsdk) GetData() bool {
 
 	copy(irsdk.latestVarBuffer, irsdk.sharedMem[latestBuf.BufOffset:latestBuf.BufOffset+irsdk.hdr.BufLen])
 	copy(irsdk.latestYamlBuffer, irsdk.sharedMem[irsdk.hdr.SessionInfoOffset:irsdk.hdr.SessionInfoOffset+irsdk.hdr.SessionInfoLen])
+	irsdk.GetYaml()
 	return true
 }
 
@@ -141,6 +145,10 @@ func (irsdk *Irsdk) GetYaml() (*yaml.IrsdkYaml, error) {
 		return nil, err
 	}
 	return &irsdk.irsdkYaml, nil
+}
+
+func (irsdk *Irsdk) GetLatestYaml() *yaml.IrsdkYaml {
+	return &irsdk.irsdkYaml
 }
 
 //nolint:errcheck // by design
@@ -155,6 +163,102 @@ func (irsdk *Irsdk) GetYamlString() string {
 
 func (irsdk *Irsdk) GetValue(name string) (any, error) {
 	return irsdk.getValueFromBuf(name, irsdk.latestVarBuffer)
+}
+
+func (irsdk *Irsdk) GetIntValue(name string) (int32, error) {
+	v, err := irsdk.getValueFromBuf(name, irsdk.latestVarBuffer)
+	if err != nil {
+		return 0, err
+	}
+	switch irsdk.vHeaderLookup[name].Type {
+	case irsdkBitField, irsdkInt:
+		return v.(int32), nil
+	}
+	return 0, ErrNoMatchingDataType
+}
+
+func (irsdk *Irsdk) GetIntValues(name string) ([]int32, error) {
+	v, err := irsdk.getValueFromBuf(name, irsdk.latestVarBuffer)
+	if err != nil {
+		return nil, err
+	}
+	if irsdk.vHeaderLookup[name].Count == 1 {
+		return nil, ErrNoMatchingDataType
+	}
+	switch irsdk.vHeaderLookup[name].Type {
+	case irsdkBitField, irsdkInt:
+		return v.([]int32), nil
+	}
+	return nil, ErrNoMatchingDataType
+}
+
+func (irsdk *Irsdk) GetFloatValue(name string) (float32, error) {
+	v, err := irsdk.getValueFromBuf(name, irsdk.latestVarBuffer)
+	if err != nil {
+		return 0, err
+	}
+	switch irsdk.vHeaderLookup[name].Type {
+	case irsdkFloat:
+		return v.(float32), nil
+	}
+	return 0, ErrNoMatchingDataType
+}
+
+func (irsdk *Irsdk) GetDoubleValue(name string) (float64, error) {
+	v, err := irsdk.getValueFromBuf(name, irsdk.latestVarBuffer)
+	if err != nil {
+		return 0, err
+	}
+	switch irsdk.vHeaderLookup[name].Type {
+	case irsdkDouble:
+		return v.(float64), nil
+	}
+	return 0, ErrNoMatchingDataType
+}
+
+func (irsdk *Irsdk) GetDoubleValues(name string) ([]float64, error) {
+	v, err := irsdk.getValueFromBuf(name, irsdk.latestVarBuffer)
+	if err != nil {
+		return nil, err
+	}
+	if irsdk.vHeaderLookup[name].Type == irsdkDouble && irsdk.vHeaderLookup[name].Count > 1 {
+		return v.([]float64), nil
+	}
+	return nil, ErrNoMatchingDataType
+}
+
+func (irsdk *Irsdk) GetFloatValues(name string) ([]float32, error) {
+	v, err := irsdk.getValueFromBuf(name, irsdk.latestVarBuffer)
+	if err != nil {
+		return nil, err
+	}
+	if irsdk.vHeaderLookup[name].Type == irsdkFloat && irsdk.vHeaderLookup[name].Count > 1 {
+		return v.([]float32), nil
+	}
+	return nil, ErrNoMatchingDataType
+}
+
+func (irsdk *Irsdk) GetBoolValue(name string) (bool, error) {
+	v, err := irsdk.getValueFromBuf(name, irsdk.latestVarBuffer)
+	if err != nil {
+		return false, err
+	}
+	switch irsdk.vHeaderLookup[name].Type {
+	case irsdkBool:
+		return v.(bool), nil
+	}
+	return false, ErrNoMatchingDataType
+}
+
+func (irsdk *Irsdk) GetBoolValues(name string) ([]bool, error) {
+	v, err := irsdk.getValueFromBuf(name, irsdk.latestVarBuffer)
+	if err != nil {
+		return nil, err
+	}
+	if irsdk.vHeaderLookup[name].Type == irsdkBool && irsdk.vHeaderLookup[name].Count > 1 {
+		return v.([]bool), nil
+	}
+	return nil, ErrNoMatchingDataType
 }
 
 func (irsdk *Irsdk) GetValueKeys() []string {

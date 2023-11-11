@@ -71,6 +71,7 @@ type DriverInfo struct {
 }
 
 type Drivers struct {
+	AbbrevName              string  `yaml:"AbbrevName" json:"AbbrevName"`
 	BodyType                int     `yaml:"BodyType" json:"BodyType"`
 	CarClassColor           int     `yaml:"CarClassColor" json:"CarClassColor"`
 	CarClassDryTireSetLimit string  `yaml:"CarClassDryTireSetLimit" json:"CarClassDryTireSetLimit"`
@@ -80,6 +81,7 @@ type Drivers struct {
 	CarClassMaxFuelPct      string  `yaml:"CarClassMaxFuelPct" json:"CarClassMaxFuelPct"`
 	CarClassPowerAdjust     string  `yaml:"CarClassPowerAdjust" json:"CarClassPowerAdjust"`
 	CarClassRelSpeed        int     `yaml:"CarClassRelSpeed" json:"CarClassRelSpeed"`
+	CarClassShortName       string  `yaml:"CarClassShortName" json:"CarClassShortName"`
 	CarClassWeightPenalty   string  `yaml:"CarClassWeightPenalty" json:"CarClassWeightPenalty"`
 	CarDesignStr            string  `yaml:"CarDesignStr" json:"CarDesignStr"`
 	CarID                   int     `yaml:"CarID" json:"CarID"`
@@ -103,6 +105,7 @@ type Drivers struct {
 	FaceType                int     `yaml:"FaceType" json:"FaceType"`
 	HelmetDesignStr         string  `yaml:"HelmetDesignStr" json:"HelmetDesignStr"`
 	HelmetType              int     `yaml:"HelmetType" json:"HelmetType"`
+	Initials                string  `yaml:"Initials" json:"Initials"`
 	IRating                 int     `yaml:"IRating" json:"IRating"`
 	IsSpectator             int     `yaml:"IsSpectator" json:"IsSpectator"`
 	LicColor                any     `yaml:"LicColor" json:"LicColor"`
