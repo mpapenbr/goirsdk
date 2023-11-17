@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"reflect"
+	"regexp"
 	"strings"
 	"syscall"
 	"time"
@@ -112,11 +113,9 @@ func (irsdk *Irsdk) WaitForValidData() bool {
 //
 //nolint:lll  //by design
 func (irsdk *Irsdk) GetData() bool {
-	start := time.Now()
 	ret := irsdk.WaitForValidData()
-	delta := time.Since(start)
-	if ret || delta > 0 {
-		// dummy
+	if !ret {
+		return false
 	}
 
 	latestBuf := irsdk.hdr.VarBufs[0]
@@ -140,9 +139,15 @@ func (irsdk *Irsdk) GetData() bool {
 }
 
 func (irsdk *Irsdk) GetYaml() (*yaml.IrsdkYaml, error) {
-	err := goyaml.Unmarshal([]byte(irsdk.GetYamlString()), &irsdk.irsdkYaml)
+	yamlData := irsdk.GetYamlString()
+	err := goyaml.Unmarshal([]byte(yamlData), &irsdk.irsdkYaml)
 	if err != nil {
-		return nil, err
+		// maybe the yaml is just not valid (see issue #6)
+		// let's try to fix it and try again
+		err := goyaml.Unmarshal([]byte(fixYaml(yamlData)), &irsdk.irsdkYaml)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return &irsdk.irsdkYaml, nil
 }
@@ -488,4 +493,14 @@ func isZeroed(buf []byte) bool {
 		}
 	}
 	return true
+}
+
+// fixYaml replaces the yaml team and user name with a quoted string
+func fixYaml(s string) string {
+	work := s
+	for _, key := range []string{"TeamName", "UserName"} {
+		re := regexp.MustCompile(fmt.Sprintf("%s: (.*)", key))
+		work = re.ReplaceAllString(work, fmt.Sprintf("%s: \"$1\"", key))
+	}
+	return work
 }
