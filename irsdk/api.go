@@ -144,7 +144,7 @@ func (irsdk *Irsdk) GetYaml() (*yaml.IrsdkYaml, error) {
 	if err != nil {
 		// maybe the yaml is just not valid (see issue #6)
 		// let's try to fix it and try again
-		err := goyaml.Unmarshal([]byte(fixYaml(yamlData)), &irsdk.irsdkYaml)
+		err := goyaml.Unmarshal([]byte(irsdk.RepairedYaml(yamlData)), &irsdk.irsdkYaml)
 		if err != nil {
 			return nil, err
 		}
@@ -164,6 +164,17 @@ func (irsdk *Irsdk) GetYamlString() string {
 	wInUtf8.Close()
 
 	return b.String()
+}
+
+// replaces the yaml team and user name with a quoted string
+// these values are not quoted in the original yaml and most certainly cause issues
+func (irsdk *Irsdk) RepairedYaml(s string) string {
+	work := s
+	for _, key := range []string{"TeamName", "UserName"} {
+		re := regexp.MustCompile(fmt.Sprintf("%s: (.*)", key))
+		work = re.ReplaceAllString(work, fmt.Sprintf("%s: \"$1\"", key))
+	}
+	return work
 }
 
 func (irsdk *Irsdk) GetValue(name string) (any, error) {
@@ -493,14 +504,4 @@ func isZeroed(buf []byte) bool {
 		}
 	}
 	return true
-}
-
-// fixYaml replaces the yaml team and user name with a quoted string
-func fixYaml(s string) string {
-	work := s
-	for _, key := range []string{"TeamName", "UserName"} {
-		re := regexp.MustCompile(fmt.Sprintf("%s: (.*)", key))
-		work = re.ReplaceAllString(work, fmt.Sprintf("%s: \"$1\"", key))
-	}
-	return work
 }

@@ -40,9 +40,10 @@ func Test_fixYaml(t *testing.T) {
 		`,
 		},
 	}
+	irsdk := &Irsdk{}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := fixYaml(tt.args.s); got != tt.want {
+			if got := irsdk.RepairedYaml(tt.args.s); got != tt.want {
 				t.Errorf("fixYaml() = %v, want %v", got, tt.want)
 			}
 		})
