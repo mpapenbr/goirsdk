@@ -6,7 +6,7 @@ package irsdk
 import (
 	"errors"
 
-	"github.com/mpapenbr/goIrsdk/yaml"
+	"github.com/mpapenbr/goirsdk/yaml"
 )
 
 var ErrNotSupported = errors.New("not supported on this platform")
