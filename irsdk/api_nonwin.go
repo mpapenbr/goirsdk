@@ -29,12 +29,12 @@ func (IrsdkDummy *IrsdkDummy) GetData() bool {
 	return false
 }
 
-func (IrsdkDummy *IrsdkDummy) GetYaml() (*yaml.IrsdkDummyYaml, error) {
-	return &IrsdkDummy.IrsdkDummyYaml, nil
+func (IrsdkDummy *IrsdkDummy) GetYaml() (*yaml.IrsdkYaml, error) {
+	return &IrsdkDummy.IrsdkYaml, nil
 }
 
-func (IrsdkDummy *IrsdkDummy) GetLatestYaml() *yaml.IrsdkDummyYaml {
-	return &IrsdkDummy.IrsdkDummyYaml
+func (IrsdkDummy *IrsdkDummy) GetLatestYaml() *yaml.IrsdkYaml {
+	return &IrsdkDummy.IrsdkYaml
 }
 
 func (IrsdkDummy *IrsdkDummy) GetYamlString() string {
