@@ -111,7 +111,7 @@ linters-settings:
     sections:
       - standard # standard packages
       - default # all other imports that do not fall in any group
-      - prefix(github.com/mpapenbr/goirsdk) # internal imports from `goirsdk`
+      - prefix(github.com/mpapenbr/goirsdk) # internal imports from `go-racelogger`
     section-separators:
       - newLine
 
@@ -466,27 +466,25 @@ linters:
   disable-all: true # disable all, selectively enable what is needed
   enable:
     # Defaults
-    - deadcode
+
     - errcheck
     - gosimple
     - govet
     - ineffassign
     - staticcheck
-    - structcheck
     - typecheck
     - unused
-    - varcheck
 
     # Additional
     - cyclop
-    - depguard
+    #- depguard
     - dogsled
     - dupl
     - errname
     - errorlint
     - exhaustive
     - forbidigo
-    # - gci
+    - gci
     - gocognit
     - goconst
     - gocritic
@@ -498,7 +496,6 @@ linters:
     # - gomnd # very noisy
     - goprintffuncname
     - gosec
-    - ifshort
     - lll
     - makezero
     - misspell

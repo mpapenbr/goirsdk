@@ -17,12 +17,13 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/mpapenbr/goirsdk/yaml"
 	"golang.org/x/exp/slices"
 	"golang.org/x/sys/windows"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/transform"
 	goyaml "gopkg.in/yaml.v3"
+
+	"github.com/mpapenbr/goirsdk/yaml"
 )
 
 const (
@@ -30,6 +31,7 @@ const (
 	DataValidEventName = "Local\\IRSDKDataValidEvent"
 )
 
+//nolint:lll // readabilty
 var (
 	ErrInvalidDataRequest = errors.New("Invalid data request")
 	ErrNoMatchingDataType = errors.New("requested data type does not match iRacing data type")
@@ -78,6 +80,7 @@ func NewIrsdkWithConfig(config ApiConfig) *Irsdk {
 	return &Irsdk{}
 }
 
+//nolint:noctx // by design
 func CheckIfSimIsRunning() bool {
 	resp, err := http.Get(SimStatusUrl)
 	if err != nil {
@@ -111,7 +114,7 @@ func (irsdk *Irsdk) WaitForValidData() bool {
 
 // returns true if new valid data is copied from iRacing telemetry to this Irdsk struct
 //
-//nolint:lll  //by design
+//nolint:lll,errcheck  //by design
 func (irsdk *Irsdk) GetData() bool {
 	ret := irsdk.WaitForValidData()
 	if !ret {
@@ -181,6 +184,7 @@ func (irsdk *Irsdk) GetValue(name string) (any, error) {
 	return irsdk.getValueFromBuf(name, irsdk.latestVarBuffer)
 }
 
+//nolint:exhaustive // by design
 func (irsdk *Irsdk) GetIntValue(name string) (int32, error) {
 	v, err := irsdk.getValueFromBuf(name, irsdk.latestVarBuffer)
 	if err != nil {
@@ -193,6 +197,7 @@ func (irsdk *Irsdk) GetIntValue(name string) (int32, error) {
 	return 0, ErrNoMatchingDataType
 }
 
+//nolint:exhaustive // by design
 func (irsdk *Irsdk) GetIntValues(name string) ([]int32, error) {
 	v, err := irsdk.getValueFromBuf(name, irsdk.latestVarBuffer)
 	if err != nil {
@@ -208,6 +213,7 @@ func (irsdk *Irsdk) GetIntValues(name string) ([]int32, error) {
 	return nil, ErrNoMatchingDataType
 }
 
+//nolint:exhaustive,gocritic // by design
 func (irsdk *Irsdk) GetFloatValue(name string) (float32, error) {
 	v, err := irsdk.getValueFromBuf(name, irsdk.latestVarBuffer)
 	if err != nil {
@@ -220,6 +226,7 @@ func (irsdk *Irsdk) GetFloatValue(name string) (float32, error) {
 	return 0, ErrNoMatchingDataType
 }
 
+//nolint:exhaustive,gocritic // by design
 func (irsdk *Irsdk) GetDoubleValue(name string) (float64, error) {
 	v, err := irsdk.getValueFromBuf(name, irsdk.latestVarBuffer)
 	if err != nil {
@@ -237,7 +244,9 @@ func (irsdk *Irsdk) GetDoubleValues(name string) ([]float64, error) {
 	if err != nil {
 		return nil, err
 	}
-	if irsdk.vHeaderLookup[name].Type == irsdkDouble && irsdk.vHeaderLookup[name].Count > 1 {
+	if irsdk.vHeaderLookup[name].Type == irsdkDouble &&
+		irsdk.vHeaderLookup[name].Count > 1 {
+
 		return v.([]float64), nil
 	}
 	return nil, ErrNoMatchingDataType
@@ -248,12 +257,15 @@ func (irsdk *Irsdk) GetFloatValues(name string) ([]float32, error) {
 	if err != nil {
 		return nil, err
 	}
-	if irsdk.vHeaderLookup[name].Type == irsdkFloat && irsdk.vHeaderLookup[name].Count > 1 {
+	if irsdk.vHeaderLookup[name].Type == irsdkFloat &&
+		irsdk.vHeaderLookup[name].Count > 1 {
+
 		return v.([]float32), nil
 	}
 	return nil, ErrNoMatchingDataType
 }
 
+//nolint:exhaustive,gocritic // by design
 func (irsdk *Irsdk) GetBoolValue(name string) (bool, error) {
 	v, err := irsdk.getValueFromBuf(name, irsdk.latestVarBuffer)
 	if err != nil {
@@ -290,6 +302,7 @@ func (irsdk *Irsdk) WriteDump(w io.Writer) (int, error) {
 	return w.Write(irsdk.sharedMem)
 }
 
+//nolint:gocritic // by design
 func (irsdk *Irsdk) DumpHeaders() {
 	fmt.Printf("Header\n%+v\n", irsdk.hdr)
 	checkForNullbytes := func(buf []byte) bool {
@@ -340,7 +353,7 @@ func (irsdk *Irsdk) initialize() {
 	irsdk.readYaml()
 }
 
-//nolint:lll,nestif,exhaustive,gocognit,cyclop // by design
+//nolint:nestif,exhaustive,gocognit,cyclop // by design
 func (irsdk *Irsdk) getValueFromBuf(name string, buf []byte) (any, error) {
 	if v, ok := irsdk.vHeaderLookup[name]; ok {
 		switch v.Type {
@@ -466,6 +479,7 @@ func (m *MMap) header() *reflect.SliceHeader {
 	return (*reflect.SliceHeader)(unsafe.Pointer(m))
 }
 
+//nolint:unused // by design
 func (m *MMap) addrLen() (uintptr, uintptr) {
 	header := m.header()
 	return header.Data, uintptr(header.Len)
