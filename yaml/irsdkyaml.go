@@ -377,7 +377,7 @@ type WeekendOptions struct {
 	CommercialMode             string `yaml:"CommercialMode" json:"CommercialMode"`
 	CourseCautions             string `yaml:"CourseCautions" json:"CourseCautions"`
 	EarthRotationSpeedupFactor int    `yaml:"EarthRotationSpeedupFactor" json:"EarthRotationSpeedupFactor"`
-	FastRepairsLimit           int    `yaml:"FastRepairsLimit" json:"FastRepairsLimit"`
+	FastRepairsLimit           string `yaml:"FastRepairsLimit" json:"FastRepairsLimit"`
 	FogLevel                   string `yaml:"FogLevel" json:"FogLevel"`
 	GreenWhiteCheckeredLimit   int    `yaml:"GreenWhiteCheckeredLimit" json:"GreenWhiteCheckeredLimit"`
 	HardcoreLevel              int    `yaml:"HardcoreLevel" json:"HardcoreLevel"`
