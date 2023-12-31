@@ -142,16 +142,22 @@ func (irsdk *Irsdk) GetData() bool {
 }
 
 func (irsdk *Irsdk) GetYaml() (*yaml.IrsdkYaml, error) {
-	yamlData := irsdk.GetYamlString()
-	err := goyaml.Unmarshal([]byte(yamlData), &irsdk.irsdkYaml)
+	yamlStr := irsdk.GetYamlString()
+	var yamlData yaml.IrsdkYaml
+	var err error
+	err = goyaml.Unmarshal([]byte(yamlStr), &yamlData)
 	if err != nil {
 		// maybe the yaml is just not valid (see issue #6)
 		// let's try to fix it and try again
-		err := goyaml.Unmarshal([]byte(irsdk.RepairedYaml(yamlData)), &irsdk.irsdkYaml)
+		err = goyaml.Unmarshal([]byte(irsdk.RepairedYaml(yamlStr)), &yamlData)
 		if err != nil {
 			return nil, err
 		}
 	}
+	if irsdk.validYamlData(&yamlData) {
+		irsdk.irsdkYaml = yamlData
+	}
+
 	return &irsdk.irsdkYaml, nil
 }
 
@@ -178,6 +184,21 @@ func (irsdk *Irsdk) RepairedYaml(s string) string {
 		work = re.ReplaceAllString(work, fmt.Sprintf("%s: \"$1\"", key))
 	}
 	return work
+}
+
+// the yaml is considered valid if it contains an entry for the pace car ;)
+func (irsdk *Irsdk) validYamlData(yamlData *yaml.IrsdkYaml) bool {
+	if yamlData == nil {
+		return false
+	}
+	foundPaceCar := false
+	for i := range yamlData.DriverInfo.Drivers {
+		if yamlData.DriverInfo.Drivers[i].CarIsPaceCar > 0 {
+			foundPaceCar = true
+		}
+	}
+
+	return foundPaceCar
 }
 
 func (irsdk *Irsdk) GetValue(name string) (any, error) {
