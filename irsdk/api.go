@@ -49,18 +49,48 @@ type Irsdk struct {
 	latestYamlBuffer   []byte                 // copy of the latest yaml raw data
 	lastValidTickCount int32                  // tickCount of the latest...Buffer
 	lastValidTime      time.Time              // timestamp of the latest valid data
+	previousYamlString string                 // yaml string from previous call
 	dataDict           map[string]interface{} // holds all data from API
 	irsdkYaml          yaml.IrsdkYaml         // parsed yaml data
+	cfg                irsdkConfig            // config values
 }
 
+type Option interface {
+	apply(*irsdkConfig)
+}
+type optionFunc func(*irsdkConfig)
+
+func (f optionFunc) apply(cfg *irsdkConfig) { f(cfg) }
+
+func WithWaitForValidDataTimeout(t time.Duration) Option {
+	return optionFunc(func(cfg *irsdkConfig) {
+		cfg.waitForSingleObjectTimeout = t
+	})
+}
+
+type irsdkConfig struct {
+	waitForSingleObjectTimeout time.Duration
+}
 type ApiConfig struct {
 	WaitForSimTimeout int
 }
 
-func NewIrsdk() *Irsdk {
+func NewIrsdk(opts ...Option) *Irsdk {
+	cfg := &irsdkConfig{
+		waitForSingleObjectTimeout: 32 * time.Millisecond,
+	}
+	for _, opt := range opts {
+		opt.apply(cfg)
+	}
+
 	mem, h := openSharedMem()
 	dataEvent := openDataValidEventHandler()
-	ret := Irsdk{sharedMem: mem, dataEventHandle: dataEvent, sharedMemHandle: h}
+	ret := Irsdk{
+		sharedMem:       mem,
+		dataEventHandle: dataEvent,
+		sharedMemHandle: h,
+		cfg:             *cfg,
+	}
 	ret.initialize()
 	return &ret
 }
@@ -74,10 +104,6 @@ func NewIrsdkWithFile(f *os.File) *Irsdk {
 	copy(ret.latestYamlBuffer,
 		ret.sharedMem[ret.hdr.SessionInfoOffset:ret.hdr.SessionInfoOffset+ret.hdr.SessionInfoLen])
 	return &ret
-}
-
-func NewIrsdkWithConfig(config ApiConfig) *Irsdk {
-	return &Irsdk{}
 }
 
 //nolint:noctx // by design
@@ -105,18 +131,32 @@ func (irsdk *Irsdk) Close() {
 }
 
 func (irsdk *Irsdk) WaitForValidData() bool {
-	h, err := windows.WaitForSingleObject(irsdk.dataEventHandle, 32)
+	return irsdk.waitForValidData(irsdk.cfg.waitForSingleObjectTimeout)
+}
+
+func (irsdk *Irsdk) waitForValidData(t time.Duration) bool {
+	h, err := windows.WaitForSingleObject(irsdk.dataEventHandle,
+		uint32(t.Milliseconds()))
 	if err != nil {
-		log.Fatalf("WaitForValidData: %v\n", err)
+		log.Fatalf("waitForValidData: %v\n", err)
 	}
 	return h == 0
 }
 
 // returns true if new valid data is copied from iRacing telemetry to this Irdsk struct
-//
-//nolint:lll,errcheck  //by design
 func (irsdk *Irsdk) GetData() bool {
-	ret := irsdk.WaitForValidData()
+	return irsdk.getDataInternal(irsdk.cfg.waitForSingleObjectTimeout)
+}
+
+// returns true if new valid data is copied from iRacing telemetry to this Irdsk struct
+// The call will wait up to dataReadyTimeout for new data to arrive
+func (irsdk *Irsdk) GetDataWithDataReadyTimeout(dataReadyTimeout time.Duration) bool {
+	return irsdk.getDataInternal(dataReadyTimeout)
+}
+
+//nolint:lll // better readability for copy
+func (irsdk *Irsdk) getDataInternal(waitForData time.Duration) bool {
+	ret := irsdk.waitForValidData(waitForData)
 	if !ret {
 		return false
 	}
@@ -137,14 +177,20 @@ func (irsdk *Irsdk) GetData() bool {
 
 	copy(irsdk.latestVarBuffer, irsdk.sharedMem[latestBuf.BufOffset:latestBuf.BufOffset+irsdk.hdr.BufLen])
 	copy(irsdk.latestYamlBuffer, irsdk.sharedMem[irsdk.hdr.SessionInfoOffset:irsdk.hdr.SessionInfoOffset+irsdk.hdr.SessionInfoLen])
+	//nolint:errcheck // by design
 	irsdk.GetYaml()
 	return true
 }
 
 func (irsdk *Irsdk) GetYaml() (*yaml.IrsdkYaml, error) {
 	yamlStr := irsdk.GetYamlString()
+	// if the yaml string is the same as the previous one, we don't need to parse it again
+	if yamlStr == irsdk.previousYamlString {
+		return &irsdk.irsdkYaml, nil
+	}
 	var yamlData yaml.IrsdkYaml
 	var err error
+
 	err = goyaml.Unmarshal([]byte(yamlStr), &yamlData)
 	if err != nil {
 		// maybe the yaml is just not valid (see issue #6)
@@ -155,6 +201,7 @@ func (irsdk *Irsdk) GetYaml() (*yaml.IrsdkYaml, error) {
 		}
 	}
 	if irsdk.validYamlData(&yamlData) {
+		irsdk.previousYamlString = yamlStr
 		irsdk.irsdkYaml = yamlData
 	}
 

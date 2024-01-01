@@ -13,7 +13,6 @@ func Test_fixYaml(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
 		{
 			"standard",
 			args{`
