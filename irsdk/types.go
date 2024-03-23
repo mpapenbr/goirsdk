@@ -73,6 +73,17 @@ const (
 	StateCoolDown
 )
 
+const (
+	TrackWetnessUnknown = iota
+	TrackWetnessDry
+	TrackWetnessMostlyDry
+	TrackWetnessVeryLightlyWet
+	TrackWetnessLightlyWet
+	TrackWetnessModeratelyWet
+	TrackWetnessVeryWet
+	TrackWetnessExtremeWet
+)
+
 type (
 	MMap   []byte
 	Header struct {
