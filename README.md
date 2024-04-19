@@ -13,6 +13,17 @@ Go module for iRacing Telemetry API access
 
 </div>
 
+## Sample usage
+
+Start the iRacing simulator and wait until the simulation is up and running.
+
+```console
+cd sample
+go run sample.go
+```
+
+The [sample] connects to the iRacing telemetry data and prints out the iRacing session time every second.
+
 ## Initial Setup
 
 This section is intended to help developers and contributors get a working copy of
@@ -60,8 +71,6 @@ command
 make install
 ```
 
-
-
 ### Using Code Formatters
 
 Code formatters format your code to match pre-decided conventions. To run automated code
@@ -83,7 +92,6 @@ To run pre-configured linters, use the command
 make lint
 ```
 
-
 ## Additional Resources
 
 ### Makefile help
@@ -100,7 +108,6 @@ make lint
 | `install` | Fetch project dependencies | NA |
 | `codestyle` | Run code-formatters | golangci-lint |
 | `lint` | Check codestyle and run linters | golangci-lint |
-
 
 <br>
 </details>
@@ -120,7 +127,6 @@ make help
 
 Both of which will list out all Makefile commands available, and a short description
 of what they do!
-
 
 ## Releases
 
@@ -202,11 +208,9 @@ The remaining labels can be created as needed!
 [github-actions]: ../../actions
 [github-releases]: ../../releases
 [precommit-config]: ./.pre-commit-config.yaml
-
 [gomod-file]: ../main/go.mod
 [github-actions-tests]: ../../actions/workflows/tests.yml
 [dependabot-pulls]: ../../pulls?utf8=%E2%9C%93&q=is%3Apr%20author%3Aapp%2Fdependabot
-
 [semver-link]: https://semver.org
 [pre-commit]: https://pre-commit.com
 [github-repo]: https://github.com/new
@@ -226,3 +230,4 @@ The remaining labels can be created as needed!
 [release-drafter]: https://github.com/marketplace/actions/release-drafter
 [creating-secrets]: https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository
 [linting-golang]: https://freshman.tech/linting-golang/
+[sample]: ./examples/sample.go
