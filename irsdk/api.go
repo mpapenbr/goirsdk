@@ -259,7 +259,7 @@ func (irsdk *Irsdk) GetIntValue(name string) (int32, error) {
 		return 0, err
 	}
 	switch irsdk.vHeaderLookup[name].Type {
-	case irsdkBitField, irsdkInt:
+	case IrsdkTypeBitField, IrsdkTypeInt:
 		return v.(int32), nil
 	}
 	return 0, ErrNoMatchingDataType
@@ -275,7 +275,7 @@ func (irsdk *Irsdk) GetIntValues(name string) ([]int32, error) {
 		return nil, ErrNoMatchingDataType
 	}
 	switch irsdk.vHeaderLookup[name].Type {
-	case irsdkBitField, irsdkInt:
+	case IrsdkTypeBitField, IrsdkTypeInt:
 		return v.([]int32), nil
 	}
 	return nil, ErrNoMatchingDataType
@@ -288,7 +288,7 @@ func (irsdk *Irsdk) GetFloatValue(name string) (float32, error) {
 		return 0, err
 	}
 	switch irsdk.vHeaderLookup[name].Type {
-	case irsdkFloat:
+	case IrsdkTypeFloat:
 		return v.(float32), nil
 	}
 	return 0, ErrNoMatchingDataType
@@ -301,7 +301,7 @@ func (irsdk *Irsdk) GetDoubleValue(name string) (float64, error) {
 		return 0, err
 	}
 	switch irsdk.vHeaderLookup[name].Type {
-	case irsdkDouble:
+	case IrsdkTypeDouble:
 		return v.(float64), nil
 	}
 	return 0, ErrNoMatchingDataType
@@ -312,7 +312,7 @@ func (irsdk *Irsdk) GetDoubleValues(name string) ([]float64, error) {
 	if err != nil {
 		return nil, err
 	}
-	if irsdk.vHeaderLookup[name].Type == irsdkDouble &&
+	if irsdk.vHeaderLookup[name].Type == IrsdkTypeDouble &&
 		irsdk.vHeaderLookup[name].Count > 1 {
 
 		return v.([]float64), nil
@@ -325,7 +325,7 @@ func (irsdk *Irsdk) GetFloatValues(name string) ([]float32, error) {
 	if err != nil {
 		return nil, err
 	}
-	if irsdk.vHeaderLookup[name].Type == irsdkFloat &&
+	if irsdk.vHeaderLookup[name].Type == IrsdkTypeFloat &&
 		irsdk.vHeaderLookup[name].Count > 1 {
 
 		return v.([]float32), nil
@@ -340,7 +340,7 @@ func (irsdk *Irsdk) GetBoolValue(name string) (bool, error) {
 		return false, err
 	}
 	switch irsdk.vHeaderLookup[name].Type {
-	case irsdkBool:
+	case IrsdkTypeBool:
 		return v.(bool), nil
 	}
 	return false, ErrNoMatchingDataType
@@ -351,7 +351,7 @@ func (irsdk *Irsdk) GetBoolValues(name string) ([]bool, error) {
 	if err != nil {
 		return nil, err
 	}
-	if irsdk.vHeaderLookup[name].Type == irsdkBool && irsdk.vHeaderLookup[name].Count > 1 {
+	if irsdk.vHeaderLookup[name].Type == IrsdkTypeBool && irsdk.vHeaderLookup[name].Count > 1 {
 		return v.([]bool), nil
 	}
 	return nil, ErrNoMatchingDataType
@@ -364,6 +364,17 @@ func (irsdk *Irsdk) GetValueKeys() []string {
 	}
 	slices.Sort(keys)
 	return keys
+}
+
+func (irsdk *Irsdk) GetVarHeaders() []VarHeader {
+	ret := make([]VarHeader, 0, len(irsdk.vHeaderLookup))
+	for _, v := range irsdk.vHeaderLookup {
+		ret = append(ret, v)
+	}
+	slices.SortFunc(ret, func(i, j VarHeader) int {
+		return strings.Compare(string(i.Name[:]), string(j.Name[:]))
+	})
+	return ret
 }
 
 func (irsdk *Irsdk) WriteDump(w io.Writer) (int, error) {
@@ -425,26 +436,26 @@ func (irsdk *Irsdk) initialize() {
 func (irsdk *Irsdk) getValueFromBuf(name string, buf []byte) (any, error) {
 	if v, ok := irsdk.vHeaderLookup[name]; ok {
 		switch v.Type {
-		case irsdkBool:
+		case IrsdkTypeBool:
 			if v.Count == 1 {
 				return extractGen[bool](buf[v.Offset : v.Offset+1]), nil
 			} else {
 				return extractGenArray[bool](buf[v.Offset:v.Offset+v.Count], int(v.Count)), nil
 			}
 
-		case irsdkInt, irsdkBitField:
+		case IrsdkTypeInt, IrsdkTypeBitField:
 			if v.Count == 1 {
 				return extractGen[int32](buf[v.Offset : v.Offset+4]), nil
 			} else {
 				return extractGenArray[int32](buf[v.Offset:v.Offset+4*v.Count], int(v.Count)), nil
 			}
-		case irsdkFloat:
+		case IrsdkTypeFloat:
 			if v.Count == 1 {
 				return extractGen[float32](buf[v.Offset : v.Offset+4]), nil
 			} else {
 				return extractGenArray[float32](buf[v.Offset:v.Offset+4*v.Count], int(v.Count)), nil
 			}
-		case irsdkDouble:
+		case IrsdkTypeDouble:
 			if v.Count == 1 {
 				return extractGen[float64](buf[v.Offset : v.Offset+8]), nil
 			} else {

@@ -20,15 +20,15 @@ type (
 
 const (
 	// 1 byte
-	irsdkChar VarType = iota
-	irsdkBool
+	IrsdkTypeChar VarType = iota
+	IrsdkTypeBool
 	// 4 bytes
-	irsdkInt
-	irsdkBitField
-	irsdkFloat
+	IrsdkTypeInt
+	IrsdkTypeBitField
+	IrsdkTypeFloat
 	// 8 bytes
-	irsdkDouble
-	irsdkETCount
+	IrsdkTypeDouble
+	IrsdkTypeETCount
 )
 
 const (

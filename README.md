@@ -24,6 +24,8 @@ go run sample.go
 
 The [sample] connects to the iRacing telemetry data and prints out the iRacing session time every second.
 
+See [variables] for an overview of available telemetry data
+
 ## Initial Setup
 
 This section is intended to help developers and contributors get a working copy of
@@ -231,3 +233,4 @@ The remaining labels can be created as needed!
 [creating-secrets]: https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository
 [linting-golang]: https://freshman.tech/linting-golang/
 [sample]: ./examples/sample.go
+[variables]: ./variables.md
