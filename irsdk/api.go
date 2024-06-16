@@ -12,6 +12,7 @@ import (
 	"os"
 	"reflect"
 	"regexp"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -29,12 +30,14 @@ import (
 const (
 	SimStatusUrl       = "http://127.0.0.1:32034/get_sim_status?object=simStatus"
 	DataValidEventName = "Local\\IRSDKDataValidEvent"
+	BroadcastMsg       = "IRSDK_BROADCASTMSG"
 )
 
 //nolint:lll // readabilty
 var (
 	ErrInvalidDataRequest = errors.New("Invalid data request")
 	ErrNoMatchingDataType = errors.New("requested data type does not match iRacing data type")
+	ErrBroadcastError     = errors.New("could not send broadcast message")
 )
 
 type Irsdk struct {
@@ -53,6 +56,8 @@ type Irsdk struct {
 	dataDict           map[string]interface{} // holds all data from API
 	irsdkYaml          yaml.IrsdkYaml         // parsed yaml data
 	cfg                irsdkConfig            // config values
+	user32             *windows.LazyDLL       // user32.dll used for broadcast messages
+	broadcastId        uintptr                // handle for broadcast messages
 }
 
 type Option interface {
@@ -407,6 +412,155 @@ func (irsdk *Irsdk) DumpHeaders() {
 			fmt.Printf("%3d:%-32s: %v\n", j, name, val)
 		}
 	}
+}
+
+// convenience function to for BroadcastCamSwitchPos
+func (irsdk *Irsdk) CamSwitchPos(position, group, camera int32) error {
+	return irsdk.BroadcastMsg(BroadcastCamSwitchPos, position, group, camera)
+}
+
+// convenience function to for BroadcastCamSwitchNum
+//
+//nolint:lll // better readability
+func (irsdk *Irsdk) CamSwitchNum(carNum string, group, camera int32) error {
+	return irsdk.BroadcastMsg(BroadcastCamSwitchNum, irsdk.padCarNum(carNum), group, camera)
+}
+
+// convenience function to for BroadcastCamSetState
+func (irsdk *Irsdk) CamSetState(mode CameraState) error {
+	return irsdk.BroadcastMsg(BroadcastCamSetState, int32(mode), 0, 0)
+}
+
+// convenience function to for BroadcastReplaySetPlaySpeed
+func (irsdk *Irsdk) ReplaySetPlaySpeed(speed int32, slowMotion bool) error {
+	b := 0
+	if slowMotion {
+		b = 1
+	}
+	return irsdk.BroadcastMsg(BroadcastReplaySetPlaySpeed, speed, int32(b), 0)
+}
+
+// convenience function to for BroadcastReplaySetPlayPosition
+func (irsdk *Irsdk) ReplaySetPlayPosition(mode ReplayPosMode, frameNum int32) error {
+	return irsdk.BroadcastMsg(BroadcastReplaySetPlayPosition, int32(mode), frameNum, 0)
+}
+
+// convenience function to for BroadcaseReplaySearch
+func (irsdk *Irsdk) ReplaySearch(mode ReplaySearchMode) error {
+	return irsdk.BroadcastMsg(BroadcastReplaySearch, int32(mode), 0, 0)
+}
+
+// convenience function to for BroadcaseReplaySetState
+func (irsdk *Irsdk) ReplaySetState(mode ReplayStateMode) error {
+	return irsdk.BroadcastMsg(BroadcastReplaySetState, int32(mode), 0, 0)
+}
+
+// convenience function to for BroadcastReloadTextures
+func (irsdk *Irsdk) ReloadAllTextures() error {
+	return irsdk.BroadcastMsg(BroadcastReloadTextures, int32(ReloadTexturesModeAll), 0, 0)
+}
+
+// convenience function to for BroadcastReloadTextures
+//
+//nolint:lll // better readability
+func (irsdk *Irsdk) ReloadTexture(carIdx int32) error {
+	return irsdk.BroadcastMsg(BroadcastReloadTextures, int32(ReloadTexturesModeCarIdx), carIdx, 0)
+}
+
+// convenience function to for BroadcastChatComand
+func (irsdk *Irsdk) ChatCommand() error {
+	return irsdk.BroadcastMsg(BroadcastChatComand, int32(ChatCommandBeginChat), 0, 0)
+}
+
+// convenience function to for BroadcastChatComand
+func (irsdk *Irsdk) ChatCommandMacro(macroNum int32) error {
+	return irsdk.BroadcastMsg(BroadcastChatComand, int32(ChatCommandMacro), macroNum, 0)
+}
+
+// convenience function to for BroadcastPitComand
+func (irsdk *Irsdk) PitCommand(cmd PitCommand, val int32) error {
+	return irsdk.BroadcastMsg(BroadcastPitCommand, int32(cmd), val, 0)
+}
+
+// convenience function to for BroadcastTelemetryCommand
+func (irsdk *Irsdk) TelemetryCommand(cmd TelemetryCommand) error {
+	return irsdk.BroadcastMsg(BroadcastTelemetryCommand, int32(cmd), 0, 0)
+}
+
+// convenience function to for BroadcastReplaySearchSessionTime
+//
+//nolint:lll // better readability
+func (irsdk *Irsdk) ReplaySearchSearchSessionTime(sessionNum, sessionTimeMs int32) error {
+	return irsdk.BroadcastMsg(BroadcastReplaySearchSessionTime, sessionNum, sessionTimeMs, 0)
+}
+
+// convenience function to for BroadcastVideoCapture
+func (irsdk *Irsdk) VideoCapture(cmd VideoCaptureMode) error {
+	return irsdk.BroadcastMsg(BroadcastVideoCapture, int32(cmd), 0, 0)
+}
+
+func (irsdk *Irsdk) BroadcastMsg(cmd BroadcastCmd, var1, var2, var3 int32) error {
+	if id := irsdk.getBroadcastId(); id != 0 {
+		sendMsg := irsdk.user32.NewProc("SendNotifyMessageW")
+		ret, _, err := sendMsg.Call(0xffff,
+			id,
+			uintptr(cmd)|uintptr(var1)<<16,
+			uintptr(var2)|uintptr(var3)<<16,
+		)
+		if ret == 1 {
+			return nil
+		} else {
+			return err
+		}
+	}
+	return ErrBroadcastError
+}
+
+func (irsdk *Irsdk) getBroadcastId() uintptr {
+	if irsdk.broadcastId == 0 {
+		irsdk.broadcastId, _ = irsdk.setupBroadcastChannel()
+	}
+	return irsdk.broadcastId
+}
+
+func (irsdk *Irsdk) setupBroadcastChannel() (uintptr, error) {
+	irsdk.user32 = windows.NewLazyDLL("user32.dll")
+	registerWindowMessageW := irsdk.user32.NewProc("RegisterWindowMessageW")
+
+	msgPtr2, _ := windows.UTF16PtrFromString(BroadcastMsg)
+	ret, _, err := registerWindowMessageW.Call(uintptr(unsafe.Pointer(msgPtr2)))
+
+	if ret == 0 {
+		return 0, err
+	}
+	return ret, nil
+}
+
+// special handling for carNums starting with '0', foe example '01', '007',...
+func (irsdk *Irsdk) padCarNum(carNum string) int32 {
+	num, _ := strconv.Atoi(carNum)
+	// count number of '0' prefixes in carNum (for carNums like '01', '007',...)
+	zeros := 0
+	for _, c := range carNum {
+		if c == '0' {
+			zeros++
+		} else {
+			break
+		}
+	}
+	retVal := num
+	numPlace := 1
+	if num > 99 {
+		numPlace = 3
+	} else if num > 9 {
+		numPlace = 2
+	}
+	if zeros > 0 {
+		numPlace += zeros
+		retVal = num + 1000*numPlace
+	}
+
+	return int32(retVal)
 }
 
 //nolint:lll,errcheck,gocritic // by design

@@ -7,7 +7,7 @@
 [![Dependencies Status](https://img.shields.io/badge/Dependencies-Up%20to%20Date-brightgreen?style=for-the-badge&logo=dependabot)][dependabot-pulls]
 [![Semantic Versioning](https://img.shields.io/badge/versioning-semantic-black?style=for-the-badge&logo=semver)][github-releases]
 [![License](https://img.shields.io/github/license/mpapenbr/goirsdk?color=red&style=for-the-badge)][project-license]
-[![Go v1.20](https://img.shields.io/badge/Go-%20v1.20-black?style=for-the-badge&logo=go)][gomod-file]
+[![Go v1.22](https://img.shields.io/badge/Go-%20v1.22-black?style=for-the-badge&logo=go)][gomod-file]
 
 Go module for iRacing Telemetry API access
 
