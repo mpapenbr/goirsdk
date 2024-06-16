@@ -1,3 +1,4 @@
+//nolint:lll // readability
 package irsdk
 
 const (
@@ -82,6 +83,127 @@ const (
 	TrackWetnessModeratelyWet
 	TrackWetnessVeryWet
 	TrackWetnessExtremeWet
+)
+
+type BroadcastCmd int32
+
+const (
+	BroadcastCamSwitchPos            BroadcastCmd = iota // car position, group, camera
+	BroadcastCamSwitchNum                                // driver #, group, camera
+	BroadcastCamSetState                                 // CameraState, unused, unused
+	BroadcastReplaySetPlaySpeed                          // speed, slowMotion, unused
+	BroadcastReplaySetPlayPosition                       // ReplayPosMode, Frame Number (high, low)
+	BroadcastReplaySearch                                // ReplaySearchMode, unused, unused
+	BroadcastReplaySetState                              // ReplayStateMode, unused, unused
+	BroadcastReloadTextures                              // ReloadTexturesMode, carIdx, unused
+	BroadcastChatComand                                  // ChatCommand, subcommand, unused
+	BroadcastPitCommand                                  // PitCommand, parameter, unused
+	BroadcastTelemetryCommand                            // TelemetryCommand, unused, unused
+	BroadcastFFBCommand                                  // FFBCommand, value (float, high,low)
+	BroadcastReplaySearchSessionTime                     //
+	BroadcastVideoCapture
+)
+
+type CameraState uint32
+
+const (
+	CameraStateIsSessionScreen = 0x0001 // the camera tool can only be activated if viewing the session screen (out of car)
+	CameraStateIsScenicActive  = 0x0002 // the scenic camera is active (no focus car)
+	// these can be changed with broadcast messages
+	CameraStateCamToolActive         = 0x0004
+	CameraStateUiHidden              = 0x0008
+	CameraStateUseAutoShotSelection  = 0x0010
+	CameraStateUseTemporaryEdits     = 0x0020
+	CameraStateUseKeyAcceleration    = 0x0040
+	CameraStateUseKey10xAcceleration = 0x0080
+	CameraStateUseMouseAimMode       = 0x0100
+)
+
+type ChatCommand uint32
+
+const (
+	ChatCommandMacro     ChatCommand = iota // pass in a number from 1-15 representing the chat macro to launch
+	ChatCommandBeginChat                    // Open up a new chat window
+	ChatCommandReply                        // Reply to last private chat
+	ChatCommandCancel                       // Close chat window
+)
+
+type PitCommand uint32
+
+const (
+	PitCommandClear      PitCommand = iota // Clear all pit checkboxes
+	PitCommandWS                           // clean the windshield, using one tear-off
+	PitCommandFuel                         // add fuel, optionally specify the amount in liters
+	PitCommandLF                           // change the left front tire, optionally specify the pressure in KPa
+	PitCommandRF                           // change the right front tire, optionally specify the pressure in KPa
+	PitCommandLR                           // change the left rear tire, optionally specify the pressure in KPa
+	PitCommandRR                           // change the right rear tire, optionally specify the pressure in KPa
+	PitCommandClearTires                   // clear tire pit checkboxes
+	PitCommandFR                           // use fast repair
+	PitCommandClearWS                      // uncheck the windshield checkbox
+	PitCommandClearFR                      // clear fast repair checkbox
+	PitCommandClearFuel                    // clear fuel checkbox
+)
+
+type TelemetryCommand uint32
+
+const (
+	TelemetryCommandStop TelemetryCommand = iota
+	TelemetryCommandStart
+	TelemetryCommandRestart
+)
+
+type FFBCommand uint32
+
+const (
+	FFBCommandMaxForce FFBCommand = iota
+)
+
+type ReplayStateMode uint32
+
+const (
+	ReplayStateModeEraseTape ReplayStateMode = iota
+)
+
+type ReplayPosMode uint32
+
+const (
+	ReplayPosModeBegin ReplayPosMode = iota
+	ReplayPosModeCurrent
+	ReplayPosModeEnd
+)
+
+type ReplaySearchMode uint32
+
+const (
+	ReplaySearchModeStart ReplaySearchMode = iota
+	ReplaySearchModeEnd
+	ReplaySearchModePrevSession
+	ReplaySearchModeNextSession
+	ReplaySearchModePrevLap
+	ReplaySearchModeNextLap
+	ReplaySearchModePrevFrame
+	ReplaySearchModeNextFrame
+	ReplaySearchModePrevIncident
+	ReplaySearchModeNextIncident
+)
+
+type ReloadTexturesMode uint32
+
+const (
+	ReloadTexturesModeAll ReloadTexturesMode = iota
+	ReloadTexturesModeCarIdx
+)
+
+type VideoCaptureMode uint32
+
+const (
+	VideoCaptureModeTriggerSreenshot VideoCaptureMode = iota
+	VideoCaptureModeStartCapture
+	VideoCaptureModeStopCapture
+	VideoCaptureModeToggleVideoCapture
+	VideoCaptureModeShowVideoTimer
+	VideoCaptureModeHideVideoTimer
 )
 
 type (
