@@ -15,8 +15,10 @@ type (
 	irValue interface {
 		int32 | float32 | float64 | bool
 	}
-	SessionState int32
-	Flags        int64
+	SessionState  int32
+	Flags         int64
+	TrackLocation int32
+	TrackSurface  int32
 )
 
 const (
@@ -83,6 +85,46 @@ const (
 	TrackWetnessModeratelyWet
 	TrackWetnessVeryWet
 	TrackWetnessExtremeWet
+)
+
+const (
+	TrackLocationNotInWorld TrackLocation = iota - 1
+	TrackLocationOffTrack
+	TrackLocationInPitStall
+	TrackLocationAproachingPits
+	TrackLocationOnTrack
+)
+
+const (
+	TrackSurfaceNotInWorld TrackSurface = iota - 1
+	TrackSurfaceUndefined
+	TrackSurfaceAsphalt1
+	TrackSurfaceAsphalt2
+	TrackSurfaceAsphalt3
+	TrackSurfaceAsphalt4
+	TrackSurfaceConcrete1
+	TrackSurfaceConcrete2
+	TrackSurfaceRacingDirt1
+	TrackSurfaceRacingDirt2
+	TrackSurfacePaint1
+	TrackSurfacePaint2
+	TrackSurfaceRumble1
+	TrackSurfaceRumble2
+	TrackSurfaceRumble3
+	TrackSurfaceRumble4
+	TrackSurfaceGrass1
+	TrackSurfaceGrass2
+	TrackSurfaceGrass3
+	TrackSurfaceGrass4
+	TrackSurfaceDirt1
+	TrackSurfaceDirt2
+	TrackSurfaceDirt3
+	TrackSurfaceDirt4
+	TrackSurfaceSand
+	TrackSurfaceGravel1
+	TrackSurfaceGravel2
+	TrackSurfaceGrasscrete
+	TrackSurfaceAstroturf
 )
 
 type BroadcastCmd int32
