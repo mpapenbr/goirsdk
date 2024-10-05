@@ -111,11 +111,13 @@ func NewIrsdkWithFile(f *os.File) *Irsdk {
 	return &ret
 }
 
+// @deprecated use IsSimRunning instead
+//
 //nolint:noctx // by design
 func CheckIfSimIsRunning() bool {
 	resp, err := http.Get(SimStatusUrl)
 	if err != nil {
-		log.Fatalf("Could not connect to iRacing service: %v\n", err)
+		log.Printf("Could not connect to iRacing service: %v\n", err)
 		return false
 	}
 	defer resp.Body.Close()
@@ -124,6 +126,21 @@ func CheckIfSimIsRunning() bool {
 		return false
 	}
 	return strings.Contains(string(body), "running:1")
+}
+
+//nolint:noctx // by design
+func IsSimRunning() (bool, error) {
+	resp, err := http.Get(SimStatusUrl)
+	if err != nil {
+		return false, err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return false, err
+	}
+	return strings.Contains(string(body), "running:1"), nil
 }
 
 func (irsdk *Irsdk) Close() {
