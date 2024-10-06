@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"time"
@@ -26,12 +28,16 @@ func main() {
 }
 
 func mainLoop() {
+	client := http.Client{Timeout: time.Second * 10}
 	for {
 
 		// loop until iRacing is running
 		for {
 			fmt.Println("Waiting for connection to iRacing")
-			if irsdk.CheckIfSimIsRunning() {
+			if simRunning, err := irsdk.IsSimRunning(context.Background(), &client); err != nil {
+				// exit with panic here if we can't connect to iRacing
+				panic(err)
+			} else if simRunning {
 				fmt.Println("iRacing Simulation is running")
 				break
 			}

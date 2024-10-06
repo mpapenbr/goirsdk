@@ -2,6 +2,7 @@ package irsdk
 
 import (
 	"bytes"
+	"context"
 	"encoding/binary"
 	"encoding/hex"
 	"errors"
@@ -112,25 +113,28 @@ func NewIrsdkWithFile(f *os.File) *Irsdk {
 }
 
 // @deprecated use IsSimRunning instead
-//
-//nolint:noctx // by design
 func CheckIfSimIsRunning() bool {
-	resp, err := http.Get(SimStatusUrl)
+	// by default we use the default http client. Note: There is no timeout set
+	client := http.DefaultClient
+	resp, err := IsSimRunning(context.Background(), client)
 	if err != nil {
 		log.Printf("Could not connect to iRacing service: %v\n", err)
 		return false
 	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return false
-	}
-	return strings.Contains(string(body), "running:1")
+	return resp
 }
 
-//nolint:noctx // by design
-func IsSimRunning() (bool, error) {
-	resp, err := http.Get(SimStatusUrl)
+// checks if the iRacing simulation is running
+func IsSimRunning(ctx context.Context, client *http.Client) (bool, error) {
+	req, err := http.NewRequestWithContext(
+		ctx,
+		http.MethodGet,
+		SimStatusUrl,
+		http.NoBody)
+	if err != nil {
+		return false, err
+	}
+	resp, err := client.Do(req)
 	if err != nil {
 		return false, err
 	}
