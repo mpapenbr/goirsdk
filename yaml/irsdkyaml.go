@@ -286,6 +286,8 @@ type SessionInfo struct {
 }
 
 type Sessions struct {
+	// Note: QualifyPositions is only used in Heat races
+	QualifyPositions                 []Results           `yaml:"QualifyPositions" json:"QualifyPositions"`
 	ResultsAverageLapTime            float64             `yaml:"ResultsAverageLapTime" json:"ResultsAverageLapTime"`
 	ResultsFastestLap                []ResultsFastestLap `yaml:"ResultsFastestLap" json:"ResultsFastestLap"`
 	ResultsLapsComplete              int                 `yaml:"ResultsLapsComplete" json:"ResultsLapsComplete"`
