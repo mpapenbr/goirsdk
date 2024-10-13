@@ -306,6 +306,7 @@ type Sessions struct {
 	SessionTime                      string              `yaml:"SessionTime" json:"SessionTime"`
 	SessionTrackRubberState          string              `yaml:"SessionTrackRubberState" json:"SessionTrackRubberState"`
 	SessionType                      string              `yaml:"SessionType" json:"SessionType"`
+	SessionSubType                   string              `yaml:"SessionSubType" json:"SessionSubType"`
 }
 
 type SplitTimeInfo struct {
