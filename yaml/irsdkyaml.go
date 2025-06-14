@@ -39,35 +39,40 @@ type Chassis struct {
 }
 
 type DriverInfo struct {
-	DriverCarEngCylinderCount int       `yaml:"DriverCarEngCylinderCount" json:"DriverCarEngCylinderCount"`
-	DriverCarEstLapTime       float64   `yaml:"DriverCarEstLapTime" json:"DriverCarEstLapTime"`
-	DriverCarFuelKgPerLtr     float64   `yaml:"DriverCarFuelKgPerLtr" json:"DriverCarFuelKgPerLtr"`
-	DriverCarFuelMaxLtr       float64   `yaml:"DriverCarFuelMaxLtr" json:"DriverCarFuelMaxLtr"`
-	DriverCarGearNeutral      int       `yaml:"DriverCarGearNeutral" json:"DriverCarGearNeutral"`
-	DriverCarGearNumForward   int       `yaml:"DriverCarGearNumForward" json:"DriverCarGearNumForward"`
-	DriverCarGearReverse      int       `yaml:"DriverCarGearReverse" json:"DriverCarGearReverse"`
-	DriverCarIdleRPM          float64   `yaml:"DriverCarIdleRPM" json:"DriverCarIdleRPM"`
-	DriverCarIdx              int       `yaml:"DriverCarIdx" json:"DriverCarIdx"`
-	DriverCarIsElectric       int       `yaml:"DriverCarIsElectric" json:"DriverCarIsElectric"`
-	DriverCarMaxFuelPct       float64   `yaml:"DriverCarMaxFuelPct" json:"DriverCarMaxFuelPct"`
-	DriverCarRedLine          float64   `yaml:"DriverCarRedLine" json:"DriverCarRedLine"`
-	DriverCarSLBlinkRPM       float64   `yaml:"DriverCarSLBlinkRPM" json:"DriverCarSLBlinkRPM"`
-	DriverCarSLFirstRPM       float64   `yaml:"DriverCarSLFirstRPM" json:"DriverCarSLFirstRPM"`
-	DriverCarSLLastRPM        float64   `yaml:"DriverCarSLLastRPM" json:"DriverCarSLLastRPM"`
-	DriverCarSLShiftRPM       float64   `yaml:"DriverCarSLShiftRPM" json:"DriverCarSLShiftRPM"`
-	DriverCarVersion          string    `yaml:"DriverCarVersion" json:"DriverCarVersion"`
-	DriverHeadPosX            float64   `yaml:"DriverHeadPosX" json:"DriverHeadPosX"`
-	DriverHeadPosY            float64   `yaml:"DriverHeadPosY" json:"DriverHeadPosY"`
-	DriverHeadPosZ            float64   `yaml:"DriverHeadPosZ" json:"DriverHeadPosZ"`
-	DriverIncidentCount       int       `yaml:"DriverIncidentCount" json:"DriverIncidentCount"`
-	DriverPitTrkPct           float64   `yaml:"DriverPitTrkPct" json:"DriverPitTrkPct"`
-	DriverSetupIsModified     int       `yaml:"DriverSetupIsModified" json:"DriverSetupIsModified"`
-	DriverSetupLoadTypeName   string    `yaml:"DriverSetupLoadTypeName" json:"DriverSetupLoadTypeName"`
-	DriverSetupName           string    `yaml:"DriverSetupName" json:"DriverSetupName"`
-	DriverSetupPassedTech     int       `yaml:"DriverSetupPassedTech" json:"DriverSetupPassedTech"`
-	DriverUserID              int       `yaml:"DriverUserID" json:"DriverUserID"`
-	Drivers                   []Drivers `yaml:"Drivers" json:"Drivers"`
-	PaceCarIdx                int       `yaml:"PaceCarIdx" json:"PaceCarIdx"`
+	DriverCarEngCylinderCount int           `yaml:"DriverCarEngCylinderCount" json:"DriverCarEngCylinderCount"`
+	DriverCarEstLapTime       float64       `yaml:"DriverCarEstLapTime" json:"DriverCarEstLapTime"`
+	DriverCarFuelKgPerLtr     float64       `yaml:"DriverCarFuelKgPerLtr" json:"DriverCarFuelKgPerLtr"`
+	DriverCarFuelMaxLtr       float64       `yaml:"DriverCarFuelMaxLtr" json:"DriverCarFuelMaxLtr"`
+	DriverCarGearNeutral      int           `yaml:"DriverCarGearNeutral" json:"DriverCarGearNeutral"`
+	DriverCarGearNumForward   int           `yaml:"DriverCarGearNumForward" json:"DriverCarGearNumForward"`
+	DriverCarGearReverse      int           `yaml:"DriverCarGearReverse" json:"DriverCarGearReverse"`
+	DriverCarIdleRPM          float64       `yaml:"DriverCarIdleRPM" json:"DriverCarIdleRPM"`
+	DriverCarIdx              int           `yaml:"DriverCarIdx" json:"DriverCarIdx"`
+	DriverCarIsElectric       int           `yaml:"DriverCarIsElectric" json:"DriverCarIsElectric"`
+	DriverCarMaxFuelPct       float64       `yaml:"DriverCarMaxFuelPct" json:"DriverCarMaxFuelPct"`
+	DriverCarRedLine          float64       `yaml:"DriverCarRedLine" json:"DriverCarRedLine"`
+	DriverCarSLBlinkRPM       float64       `yaml:"DriverCarSLBlinkRPM" json:"DriverCarSLBlinkRPM"`
+	DriverCarSLFirstRPM       float64       `yaml:"DriverCarSLFirstRPM" json:"DriverCarSLFirstRPM"`
+	DriverCarSLLastRPM        float64       `yaml:"DriverCarSLLastRPM" json:"DriverCarSLLastRPM"`
+	DriverCarSLShiftRPM       float64       `yaml:"DriverCarSLShiftRPM" json:"DriverCarSLShiftRPM"`
+	DriverCarVersion          string        `yaml:"DriverCarVersion" json:"DriverCarVersion"`
+	DriverHeadPosX            float64       `yaml:"DriverHeadPosX" json:"DriverHeadPosX"`
+	DriverHeadPosY            float64       `yaml:"DriverHeadPosY" json:"DriverHeadPosY"`
+	DriverHeadPosZ            float64       `yaml:"DriverHeadPosZ" json:"DriverHeadPosZ"`
+	DriverIncidentCount       int           `yaml:"DriverIncidentCount" json:"DriverIncidentCount"`
+	DriverPitTrkPct           float64       `yaml:"DriverPitTrkPct" json:"DriverPitTrkPct"`
+	DriverSetupIsModified     int           `yaml:"DriverSetupIsModified" json:"DriverSetupIsModified"`
+	DriverSetupLoadTypeName   string        `yaml:"DriverSetupLoadTypeName" json:"DriverSetupLoadTypeName"`
+	DriverSetupName           string        `yaml:"DriverSetupName" json:"DriverSetupName"`
+	DriverSetupPassedTech     int           `yaml:"DriverSetupPassedTech" json:"DriverSetupPassedTech"`
+	DriverTires               []DriverTires `yaml:"DriverTires" json:"DriverTires"`
+	DriverUserID              int           `yaml:"DriverUserID" json:"DriverUserID"`
+	Drivers                   []Drivers     `yaml:"Drivers" json:"Drivers"`
+	PaceCarIdx                int           `yaml:"PaceCarIdx" json:"PaceCarIdx"`
+}
+type DriverTires struct {
+	TireIndex        int    `yaml:"TireIndex" json:"TireIndex"`
+	TireCompoundType string `yaml:"TireCompoundType" json:"TireCompoundType"`
 }
 
 type Drivers struct {
