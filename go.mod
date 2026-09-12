@@ -1,10 +1,10 @@
 module github.com/mpapenbr/goirsdk
 
-go 1.25.0
+go 1.26.0
 
 require (
 	golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa
-	golang.org/x/sys v0.47.0
+	golang.org/x/sys v0.48.0
 	golang.org/x/text v0.41.0
 	gopkg.in/yaml.v3 v3.0.1
 )
